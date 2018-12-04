@@ -25,3 +25,4 @@ Screen-shot of Facebook post regarding intruder attack.
 |**face_detrec_video.py**|detect & recognize intruders in real-time video and notifies on facebook|
 |face_recognition.py|train eigen_model & recognise faces in pre-cropped images|
 |resize_rotate_images.py|pre-process images and saves output to output_folder|
+"# FaceRecognizer" 
