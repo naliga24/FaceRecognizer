@@ -19,7 +19,7 @@ Takes two arguments:
 '''
 
 import cv2
-import cv2.cv as cv
+#import cv2.cv as cv
 import numpy as np
 from os import listdir
 import sys, time
@@ -90,7 +90,7 @@ if __name__== "__main__":
 		#starting to detect face in given image
 		frontal_face= cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 		#bBoxes= frontal_face.detectMultiScale(pre_image, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30), flags = cv.CV_HAAR_SCALE_IMAGE)
-		bBoxes= frontal_face.detectMultiScale(pre_image, scaleFactor=1.3, minNeighbors=4, minSize=(30, 30), flags = cv.CV_HAAR_SCALE_IMAGE)
+		bBoxes= frontal_face.detectMultiScale(pre_image, scaleFactor=1.3, minNeighbors=4, minSize=(30, 30), flags = cv2.CASCADE_SCALE_IMAGE) #cv2.cv.CV_HAAR_SCALE_IMAGE (no use anymore)
 
 		for bBox in bBoxes:
 			(p,q,r,s)= bBox

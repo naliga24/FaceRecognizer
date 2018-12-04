@@ -8,7 +8,7 @@ If face(s) is(are) found, it crops and saves them at "output_path".
 '''
 
 import cv2
-import cv2.cv as cv
+#import cv2.cv as cv
 from os import listdir
 import time
 
@@ -24,12 +24,12 @@ def saveCropped(img, name):
 
 if __name__== "__main__":
 	# paths to input and output images
-	input_path= "old/input_images/"
-	output_path= "old/output_images/"
+	input_path= "input_images/"
+	output_path= "output_images/"
 
 	# load pre-trained frontalface cascade classifier
 	frontal_face= cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-	input_names= listdir("/home/suryateja/Documents/GitHub/FaceRecognizer/"+ input_path)
+	input_names= listdir("C:/Users/nalig/FaceRecognizer/"+ input_path)
 
 	print("Starting to detect faces in images and save the cropped images to output file...")
 	sttime= time.clock()
@@ -41,7 +41,7 @@ if __name__== "__main__":
 		gray_img= cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
 
 		# find the bounding boxes around detected faces in images
-		bBoxes= frontal_face.detectMultiScale(gray_img, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30), flags = cv.CV_HAAR_SCALE_IMAGE)
+		bBoxes= frontal_face.detectMultiScale(gray_img, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30), flags = cv2.CASCADE_SCALE_IMAGE) #cv2.cv.CV_HAAR_SCALE_IMAGE (no use anymore)
 		#print(bBoxes)
 
 		for box in bBoxes:
