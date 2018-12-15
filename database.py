@@ -24,7 +24,7 @@ def select_subject_info():
         print(row[0]+' '+row[1]+' '+row[2])
     mydb.close() 
 
-def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceStudentCodeName):
+def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceStudentCodeName,classAttendanceLat,classAttendanceLng):
     mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
@@ -43,7 +43,7 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceS
     result = cursor.fetchall()
     print('COUNT(STUDENT_CODE_NAME) = '+str(result[0][0]))
     if result[0][0] == 1:
-      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_CODE_NAME)"
+      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_CODE_NAME , CLASS_ATTENDANCE_LAT , CLASS_ATTENDANCE_LNG)"
       sql += " SELECT DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
       sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1,"
@@ -52,7 +52,9 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceS
       sql += " (SELECT SUBJECT_NO FROM subject_info WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'),"
       sql += " (SELECT STUDENT_NO FROM student_info WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'),"
       sql += " '"+encodestring+"',"
-      sql += " '"+classAttendanceStudentCodeName+"'"
+      sql += " '"+classAttendanceStudentCodeName+"',"
+      sql += " '"+repr(classAttendanceLat)+"',"
+      sql += " '"+repr(classAttendanceLng)+"'"
       print(sql)
       cursor.execute(sql)
       mydb.commit()

@@ -36,6 +36,8 @@ import time
 
 LINE_ACCESS_TOKEN="MsrOOSUVgB38JhrKhni36IEqDftOpZbUgVYwZZmpxQT"
 url="https://notify-api.line.me/api/notify"
+classAttendanceLat=""
+classAttendanceLng=""
 
 def get_images(path, size):
     '''
@@ -160,15 +162,19 @@ def line_ipstack():
         # }
         # requests.post(LINE_API, headers=headers, data=json.dumps(data1))
         #sys.exit()
-def line_googlemaps():
-    # gm = googlemaps.Client(key = api_key)
-    # geocode_result = gm.geocode('scranton')[0]
+def current_position():
+    global classAttendanceLat
+    global classAttendanceLng
     session = requests.Session()
     a = session.post('https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBu87xwiRb4bzfjLyFsGNFzGI1dLCVQhcM' , headers = {'Content-Type': 'application/json'})
     print(a.text)
     geo_json = json.loads(a.text)
-    latitude = geo_json['location']['lat']
-    longitude = geo_json['location']['lng']
+    classAttendanceLat = geo_json['location']['lat']
+    classAttendanceLng = geo_json['location']['lng']
+
+def line_googlemaps():
+    # gm = googlemaps.Client(key = api_key)
+    # geocode_result = gm.geocode('scranton')[0]
     # map={
     # 'position':  { 'lat': latitude, 'lng': longitude },
     # 'icon': {
@@ -176,7 +182,7 @@ def line_googlemaps():
     # }
     # }
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/@"+repr(latitude)+","+repr(longitude)}) #wrong syntax(return default)
-    msg = urllib.urlencode({"message":"https://www.google.com/maps/search/?api=1&query="+repr(latitude)+","+repr(longitude)})#3G result wrong,cable near(show red)
+    msg = urllib.urlencode({"message":"https://www.google.com/maps/search/?api=1&query="+repr(classAttendanceLat)+","+repr(classAttendanceLng)})#3G result wrong,cable near(show red)
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/dir/?api=1&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/@?api=1&map_action=map&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/@?api=1&map_action=pano&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
@@ -276,10 +282,11 @@ if __name__== "__main__":
                         print("Student is "+ people[final_label])
                         picture_name= "frame.jpg"
                         cv2.imwrite(picture_name, frame)
-                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,classAttendanceStudentCodeName)
+                        current_position()
+                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,classAttendanceStudentCodeName,classAttendanceLat,classAttendanceLng)
                         line_pic(people[final_label])
                         #line_ipstack()
-                        #line_googlemaps()
+                        line_googlemaps()
                         google_tts(unicode(people[final_label],"utf-8"))
                         final_5= []
                         classAttendanceStudentCodeName = inputClassAttendanceStudentCodeName()
