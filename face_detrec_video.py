@@ -128,7 +128,7 @@ def line_pic(message):
         print(b.text) 
         #sys.exit()
 
-def line_location():
+def line_ipstack():
         send_url = "http://api.ipstack.com/check?access_key=5ce47b09f9ee6a9e089068f0a6042b44"
         geo_req = requests.get(send_url)
         geo_json = json.loads(geo_req.text)
@@ -185,53 +185,39 @@ def line_googlemaps():
     a = session.post(url , headers = LINE_HEADERS , data=msg)
     print(a.text)
     #sys.exit()
-def post_on_facebook(intruder, counter, picture_name):
-    '''
-    Takes name of intruder and posts on your facebok timeline.
-    You need to get access_token from facebook GraphAPI and paste it below.
-    '''
-    # has a life time of 1 hr. So, no use even if you steal this 😜
-    token= "EAAiFv4JrXxYBAHdaMwWLpJyHBPyTnVkoDkTjirypPxYgEBHwunCxyorbilnHvoj8BPcf3LoZC8yFkZBDcnaqZAByrD2cDc6KXaWts5yxLzXFCdRsRhKp1xpUqeOiA0DIkE3FqZBaa8QKgMhZB9U9HBYX31TLdCD7lXrthMRcapi0ZCvxp5YJZAVEl5dbGawXfFZBs5ThBvMJu5AFGOv1IAYH"
-    url= "https://graph.facebook.com/me/feed"
 
-    graph= facebook.GraphAPI(access_token= token)
-
-    my_message1= "Andrew is not in his room at present and '"+ intruder+ "' entered into his room without permission."
-    my_message2= "PS: This is automatically posted by 'intruder alert system' built by Andrew!\n"
-    final_message= my_message1+"\n\n"+my_message2+ "\n"+ str(counter)
-
-    #post on facebook using requests.
-    # params= {"access_token": token, "message": final_message}
-    # posted= requests.post(url, params)
-
-    # if str(posted)== "<Response [200]>":
-    #     print("\tSuccessfully posted on your timeline.")
-    # else:
-    #     print("\tPlease check your token and its permissions.")
-    #     print("\tYou cannot post same message more than once in a single POST request.")
-
-    #post on facebook using python GraphAPI
-    graph.put_photo(image= open(picture_name), message= final_message)
 def get_student_name(str):
     id = get_student_id(str)
     name = str.replace(id,'')
     return name
+
 def google_tts(text):
     tts = gTTS(text=get_student_name(text),lang='th')
     tts.save('student-name.mp3')
     os.system('student-name.mp3')
-    time.sleep( 3 )
-    os.system('student-next.mp3')
     time.sleep( 6 )
+
 def get_student_id(str):
     id = str[::-1]
     id = id[0:10]
     id = id[::-1]
     return id
+
+def inputClassAttendanceStudentCodeName():    
+    tmp = raw_input('please type 10 digits of student code name!: ')
+    while(tmp.isalpha() or len(tmp) != 10):
+        print('wrong format input!')
+        tmp = raw_input('please type 10 digits of student code name!: ')
+    return tmp
+
 if __name__== "__main__":
     if len(sys.argv)!= 3:
         print("Wrong number of arguments! See the usage.\n")
         print("Usage: face_detrec_video.py <full/path/to/root/images/folder> <subject_name>")
+        sys.exit()
+    checkSubjectCodeName = database.selectSubjectInfoSubjectCodeName(sys.argv[2])
+    if checkSubjectCodeName == False:  
+        print("Wrong subject code name! This subject has inactive status.")
         sys.exit()
     arg_two= sys.argv[2] #subject_name
     arg_one= sys.argv[1]
@@ -244,6 +230,7 @@ if __name__== "__main__":
     last_20= [0 for i in range(20)]
     final_5= []
     box_text= "นักศึกษา: "
+    classAttendanceStudentCodeName = inputClassAttendanceStudentCodeName()
     while(True):
         ret, frame= cap.read()
         if ret is True:
@@ -262,10 +249,6 @@ if __name__== "__main__":
             [predicted_label, predicted_conf]= eigen_model.predict(np.asarray(crop_gray_frame)) #finding result
             last_20.append(predicted_label)
             last_20= last_20[1:]
-            print(last_20)
-            print(bBoxes)
-            print(bBox)
-            print(counter)
             '''
             counter modulo x: changes value of final label for every x frames
             Use max_label or predicted_label as you wish to see in the output video.
@@ -288,23 +271,22 @@ if __name__== "__main__":
                 if counter > 20:   #counter> 20
                     print("Will post on LINE notify if this counter reaches to 1: "+ str(len(final_5)+ 1))
                     final_5.append(max_label)       #it always takes max_label into consideration
-                    if len(final_5)== 5:
+                    if len(final_5)== 1:
                         final_label= majority(final_5)
                         print("Student is "+ people[final_label])
                         picture_name= "frame.jpg"
                         cv2.imwrite(picture_name, frame)
-                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two)
-                        #post_on_facebook(people[final_label], counter, picture_name)
+                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,classAttendanceStudentCodeName)
                         line_pic(people[final_label])
-                        #line_location()
+                        #line_ipstack()
                         #line_googlemaps()
                         google_tts(unicode(people[final_label],"utf-8"))
                         final_5= []
+                        classAttendanceStudentCodeName = inputClassAttendanceStudentCodeName()
 
 
 
          cv2.imshow("Video Window", frame)
-         print(counter)
          counter+= 1
 
          if (cv2.waitKey(5) & 0xFF== 27):

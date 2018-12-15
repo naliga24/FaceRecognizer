@@ -24,37 +24,63 @@ def select_subject_info():
         print(row[0]+' '+row[1]+' '+row[2])
     mydb.close() 
 
-def insert_class_attendace_info(studentId,subjectId):
+def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceStudentCodeName):
     mydb = mysql.connector.connect(
-    host="us-cdbr-iron-east-01.cleardb.net",
-    user="b2742dd9273833",
-    passwd="99f7887d5ff6a81",
-    database="heroku_766db354cb15187",
+    host="127.0.0.1",
+    user="root",
+    passwd="root",
+    database="cos4105",
     )
     cursor = mydb.cursor()
     #image = Image.open("frame.jpg", "rb")
     blob_value = open('frame.jpg', 'rb').read()
     encodestring = base64.b64encode(blob_value)
-    sql ="SELECT COUNT(*)"
+    sql ="SELECT COUNT(STUDENT_CODE_NAME)"
     sql += " FROM student_info"
-    sql += " WHERE student_id = '"+studentId+"'"
+    sql += " WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'"
+    print(sql)
     cursor.execute(sql)
     result = cursor.fetchall()
-    print(result[0][0])
+    print('COUNT(STUDENT_CODE_NAME) = '+str(result[0][0]))
     if result[0][0] == 1:
-      sql = "INSERT INTO class_attendance_info (class_attendance_id, class_attendance_date ,class_attendance_time, subject_id, student_id, semester_id, image_info)"
+      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_CODE_NAME)"
       sql += " SELECT DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
-      sql += " (SELECT COUNT( class_attendance_date ) FROM class_attendance_info"
-      sql += " WHERE class_attendance_date = CURRENT_DATE ) + 1,"
-      sql += " DATE_FORMAT( CURRENT_DATE,'%Y-%m-%d' )," 
-      sql += " TIME_FORMAT( CURRENT_TIME,'%h:%m:%s' ),"
-      sql += " (SELECT subject_id FROM subject_info WHERE subject_name = '"+subjectId+"'),"
-      sql += " '"+studentId+"',"
-      sql += " (SELECT semester_id FROM semester_info ORDER BY semester_id DESC LIMIT 1),"
-      sql += " '"+encodestring+"'"
+      sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
+      sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1,"
+      sql += " CURRENT_DATE," 
+      sql += " CURRENT_TIME,"
+      sql += " (SELECT SUBJECT_NO FROM subject_info WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'),"
+      sql += " (SELECT STUDENT_NO FROM student_info WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'),"
+      sql += " '"+encodestring+"',"
+      sql += " '"+classAttendanceStudentCodeName+"'"
+      print(sql)
       cursor.execute(sql)
       mydb.commit()
+    elif result[0][0] == 0:
+      print("Can't insert classAttendanceInfo, studentCodeName of '"+studentCodeName+"'"+" not found in database systems.")
     mydb.close() 
+
+def selectSubjectInfoSubjectCodeName(subjectCodeName):
+    mydb = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    passwd="root",
+    database="cos4105",
+    )
+    cursor = mydb.cursor()
+    sql = "SELECT COUNT(SUBJECT_CODE_NAME)"
+    sql += " FROM subject_info"
+    sql += " WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'"
+    print(sql)
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    #print(result[0][0])
+    if result[0][0] == 1:
+     return True
+    else:
+     return False 
+    mydb.close() 
+
 
 def select_class_attendace_info():
     mydb = mysql.connector.connect(
@@ -86,4 +112,6 @@ def select_class_attendace_info():
 if __name__== "__main__":
     #insert_class_attendace_info('6005004780','cos1103')
     #select_subject_info()
-    select_class_attendace_info()
+    #select_class_attendace_info()
+    #selectSubjectInfoSubjectCodeName('cos1102')
+    print(selectSubjectInfoSubjectCodeName('cos1102'))
