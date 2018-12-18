@@ -209,7 +209,7 @@ def get_student_id(str):
     id = id[::-1]
     return id
 
-def inputClassAttendanceStudentCodeName():    
+def inputStudentCodeNameKey():    
     tmp = raw_input('please type 10 digits of student code name!: ')
     while(tmp.isalpha() or len(tmp) != 10):
         print('wrong format input!')
@@ -236,7 +236,7 @@ if __name__== "__main__":
     last_20= [0 for i in range(20)]
     final_5= []
     box_text= "นักศึกษา: "
-    classAttendanceStudentCodeName = inputClassAttendanceStudentCodeName()
+    studentCodeNameKey = inputStudentCodeNameKey()
     while(True):
         ret, frame= cap.read()
         if ret is True:
@@ -282,14 +282,14 @@ if __name__== "__main__":
                         print("Student is "+ people[final_label])
                         picture_name= "frame.jpg"
                         cv2.imwrite(picture_name, frame)
-                        current_position()
-                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,classAttendanceStudentCodeName,classAttendanceLat,classAttendanceLng)
                         line_pic(people[final_label])
+                        current_position()
+                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
                         #line_ipstack()
                         line_googlemaps()
-                        google_tts(unicode(people[final_label],"utf-8"))
+                        #google_tts(unicode(people[final_label],"utf-8"))
                         final_5= []
-                        classAttendanceStudentCodeName = inputClassAttendanceStudentCodeName()
+                        studentCodeNameKey = inputStudentCodeNameKey()
 
 
 
