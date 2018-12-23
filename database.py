@@ -11,22 +11,28 @@ import io
 import requests
 import os
 
-def select_subject_info():
+def selectSemesterInfoSemesterName(semesterName):
     mydb = mysql.connector.connect(
-    host="us-cdbr-iron-east-01.cleardb.net",
-    user="b2742dd9273833",
-    passwd="99f7887d5ff6a81",
-    database="heroku_766db354cb15187",
+    host="127.0.0.1",
+    user="root",
+    passwd="root",
+    database="cos4105",
     )
     cursor = mydb.cursor()
-    sql = "SELECT * FROM subject_info"
+    sql = "SELECT COUNT(SEMESTER_NAME)"
+    sql += " FROM semester_info"
+    sql += " WHERE SEMESTER_NAME = '"+semesterName+"'"
+    print(sql)
     cursor.execute(sql)
     result = cursor.fetchall()
-    for row in result:
-        print(row[0]+' '+row[1]+' '+row[2])
-    mydb.close() 
+    mydb.close()  
+    #print(result[0][0])
+    if result[0][0] == 1:
+     return True
+    else:
+     return False 
 
-def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceStudentKeyCodeName,classAttendanceLat,classAttendanceLng):
+def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,classAttendanceStudentKeyCodeName,classAttendanceLat,classAttendanceLng):
     mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
@@ -45,12 +51,13 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,classAttendanceS
     result = cursor.fetchall()
     print('COUNT(STUDENT_CODE_NAME) = '+str(result[0][0]))
     if result[0][0] == 1:
-      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_KEY_CODE_NAME , CLASS_ATTENDANCE_LAT , CLASS_ATTENDANCE_LNG , CONFIRM_STATUS_NO)"
+      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SEMESTER_NO , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_KEY_CODE_NAME , CLASS_ATTENDANCE_LAT , CLASS_ATTENDANCE_LNG , CONFIRM_STATUS_NO)"
       sql += " SELECT DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
       sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1,"
       sql += " CURRENT_DATE," 
       sql += " CURRENT_TIME,"
+      sql += " (SELECT SEMESTER_NO FROM semester_info WHERE SEMESTER_NAME = '"+semesterName+"'),"
       sql += " (SELECT SUBJECT_NO FROM subject_info WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'),"
       sql += " (SELECT STUDENT_NO FROM student_info WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'),"
       sql += " CONCAT(DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
@@ -96,12 +103,12 @@ def selectSubjectInfoSubjectCodeName(subjectCodeName):
     print(sql)
     cursor.execute(sql)
     result = cursor.fetchall()
+    mydb.close() 
     #print(result[0][0])
     if result[0][0] == 1:
      return True
     else:
      return False 
-    mydb.close() 
 
 
 def select_class_attendace_info():
@@ -132,7 +139,7 @@ def select_class_attendace_info():
     mydb.close() 
 
 if __name__== "__main__":
-    insert_class_attendace_info('6005004780','cos1103','x','x','x')
+    insert_class_attendace_info('6005004780','cos1103','s/74','x','x','x')
     #select_subject_info()
     #select_class_attendace_info()
     #selectSubjectInfoSubjectCodeName('cos1102')

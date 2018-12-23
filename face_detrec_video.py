@@ -217,14 +217,19 @@ def inputStudentCodeNameKey():
     return tmp
 
 if __name__== "__main__":
-    if len(sys.argv)!= 3:
+    if len(sys.argv)!= 4:
         print("Wrong number of arguments! See the usage.\n")
-        print("Usage: face_detrec_video.py <full/path/to/root/images/folder> <subject_name>")
+        print("Usage: face_detrec_video.py <full/path/to/root/images/folder> <subject_name> <semester_name>")
         sys.exit()
     checkSubjectCodeName = database.selectSubjectInfoSubjectCodeName(sys.argv[2])
     if checkSubjectCodeName == False:  
-        print("Wrong subject code name! This subject has inactive status.")
+        print("Wrong subject code name!. This subject has inactive status or doesn't exists.")
         sys.exit()
+    checkSemesterName = database.selectSemesterInfoSemesterName(sys.argv[3])    
+    if checkSemesterName == False:  
+        print("Wrong semester name!. This semester name  doesn't exists.")
+        sys.exit()    
+    arg_three= sys.argv[3] #semester name
     arg_two= sys.argv[2] #subject_name
     arg_one= sys.argv[1]
     eigen_model, people= train_model(arg_one)
@@ -284,7 +289,7 @@ if __name__== "__main__":
                         cv2.imwrite(picture_name, frame)
                         line_pic(people[final_label])
                         current_position()
-                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
+                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,arg_three,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
                         #line_ipstack()
                         line_googlemaps()
                         #google_tts(unicode(people[final_label],"utf-8"))
