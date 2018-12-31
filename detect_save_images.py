@@ -11,8 +11,11 @@ import cv2
 #import cv2.cv as cv
 from os import listdir
 import time
+# paths to input and output images
+input_path= "input_images/"
+output_path= "output_images/"
 
-def cropImage(img, box):
+def cropImage(img, box,name):
 	[p, q, r, s]= box
 	# crop and save the image provided with the co-ordinates of bounding box
 	write_img_color= img[q:q+ s, p:p+ r]
@@ -22,11 +25,7 @@ def cropImage(img, box):
 def saveCropped(img, name):
 	cv2.imwrite(output_path+ name+ ".jpg", img)
 
-if __name__== "__main__":
-	# paths to input and output images
-	input_path= "input_images/"
-	output_path= "output_images/"
-
+def cropImageAndSaveCropped():
 	# load pre-trained frontalface cascade classifier
 	frontal_face= cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 	input_names= listdir("C:/Users/nalig/FaceRecognizer/"+ input_path)
@@ -47,7 +46,11 @@ if __name__== "__main__":
 		for box in bBoxes:
 			#print(box)
 			# crop and save the image at specified location
-			cropImage(color_img, box)
+			cropImage(color_img, box,name)
 			i+= 1
 
 	print("Successfully completed the task in %.2f Secs." % (time.clock()- sttime))
+
+if __name__== "__main__":
+	cropImageAndSaveCropped()
+

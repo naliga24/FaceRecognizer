@@ -22,22 +22,18 @@ import cv2
 import numpy as np
 import os
 import sys, time
-import requests
-import request
 import json
 import urllib
-import googlemaps
-from flask import Flask, request
 from gtts import gTTS
-import mysql.connector
-import database
+import classAttendance
+import subject
+import semester
+import line
 import time
-#api_key = os.environ['AIzaSyBu87xwiRb4bzfjLyFsGNFzGI1dLCVQhcM'] #error
+import requests
+import position
 
-LINE_ACCESS_TOKEN="MsrOOSUVgB38JhrKhni36IEqDftOpZbUgVYwZZmpxQT"
-url="https://notify-api.line.me/api/notify"
-classAttendanceLat=""
-classAttendanceLng=""
+#api_key = os.environ['AIzaSyBu87xwiRb4bzfjLyFsGNFzGI1dLCVQhcM'] #error
 
 def get_images(path, size):
     '''
@@ -111,93 +107,12 @@ def majority(mylist):
 
     return ans
 
-def line_text(message):
-        msg = urllib.urlencode({"message":message})
-        LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+LINE_ACCESS_TOKEN}
-        session = requests.Session()
-        a = session.post(url , headers = LINE_HEADERS , data = msg)
-        print(a.text)
-
-def line_pic(message):
-        res= {"imageFile":open('frame.jpg','rb')}
-        print (res)
-        data = ({
-        "message":message
-        })
-        LINE_HEADERS = {"Authorization":"Bearer "+LINE_ACCESS_TOKEN}
-        session = requests.Session()
-        b = session.post(url , headers = LINE_HEADERS , files = res , data = data)
-        print(b.text) 
-        #sys.exit()
-
-def line_ipstack():
-        send_url = "http://api.ipstack.com/check?access_key=5ce47b09f9ee6a9e089068f0a6042b44"
-        geo_req = requests.get(send_url)
-        geo_json = json.loads(geo_req.text)
-        latitude = geo_json['latitude']
-        longitude = geo_json['longitude']
-        city = geo_json['city']
-        print(geo_json)   
-        msg = urllib.urlencode({"message":"https://www.google.com/maps/search/?api=1&query="+repr(latitude)+","+repr(longitude)})
-        LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+LINE_ACCESS_TOKEN}
-        session = requests.Session()
-        a = session.post(url , headers = LINE_HEADERS , data=msg)
-        print(a.text)
-        
-        # LINE_API_KEY = 'Bearer /mnxywYk+P8dLSFrPpEcZinPM5xmqGvzWGDLnOLhcmz3Iv4ymldO/P75wa3yPZCv2y4MNEMa/m9kHbaTHtKyxNJsoXIhWinqT8l94ePO7vflwsGHPiF0VzH8OSSL/4DRNH4zNVYWuvGDHAjyqPBuewdB04t89/1O/w1cDnyilFU='
-        # LINE_API = 'https://api.line.me/v2/bot/message/push'  #reply
-        # headers = {
-        # 'Content-Type': 'application/json; charset=UTF-8',
-        # 'Authorization': LINE_API_KEY
-        # }
-        # data1 ={
-        # "to":""
-        # "messages":[{
-        # "type": "location",
-        # "title": "my location",
-        # "address": "ฺBangkok, Thailand",
-        # "latitude": 35.65910807942215,
-        # "longitude": 139.70372892916203
-        # }]
-        # }
-        # requests.post(LINE_API, headers=headers, data=json.dumps(data1))
-        #sys.exit()
-def current_position():
-    global classAttendanceLat
-    global classAttendanceLng
-    session = requests.Session()
-    a = session.post('https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBu87xwiRb4bzfjLyFsGNFzGI1dLCVQhcM' , headers = {'Content-Type': 'application/json'})
-    print(a.text)
-    geo_json = json.loads(a.text)
-    classAttendanceLat = geo_json['location']['lat']
-    classAttendanceLng = geo_json['location']['lng']
-
-def line_googlemaps():
-    # gm = googlemaps.Client(key = api_key)
-    # geocode_result = gm.geocode('scranton')[0]
-    # map={
-    # 'position':  { 'lat': latitude, 'lng': longitude },
-    # 'icon': {
-    # 'url': "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-    # }
-    # }
-    #msg = urllib.urlencode({"message":"https://www.google.com/maps/@"+repr(latitude)+","+repr(longitude)}) #wrong syntax(return default)
-    msg = urllib.urlencode({"message":"https://www.google.com/maps/search/?api=1&query="+repr(classAttendanceLat)+","+repr(classAttendanceLng)})#3G result wrong,cable near(show red)
-    #msg = urllib.urlencode({"message":"https://www.google.com/maps/dir/?api=1&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
-    #msg = urllib.urlencode({"message":"https://www.google.com/maps/@?api=1&map_action=map&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
-    #msg = urllib.urlencode({"message":"https://www.google.com/maps/@?api=1&map_action=pano&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
-    LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+LINE_ACCESS_TOKEN}
-    session = requests.Session()
-    a = session.post(url , headers = LINE_HEADERS , data=msg)
-    print(a.text)
-    #sys.exit()
-
 def get_student_name(str):
     id = get_student_id(str)
     name = str.replace(id,'')
     return name
 
-def google_tts(text):
+def text_to_voice(text):
     tts = gTTS(text=get_student_name(text),lang='th')
     tts.save('student-name.mp3')
     os.system('student-name.mp3')
@@ -216,17 +131,26 @@ def inputStudentCodeNameKey():
         tmp = raw_input('please type 10 digits of student code name!: ')
     return tmp
 
+def current_position():
+    session = requests.Session()
+    a = session.post('https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBu87xwiRb4bzfjLyFsGNFzGI1dLCVQhcM' , headers = {'Content-Type': 'application/json'})
+    print(a.text)
+    geo_json = json.loads(a.text)
+    lat = geo_json['location']['lat']
+    lng = geo_json['location']['lng']
+    return [lat, lng]
+
 if __name__== "__main__":
     if len(sys.argv)!= 4:
         print("Wrong number of arguments! See the usage.\n")
         print("Usage: face_detrec_video.py <full/path/to/root/images/folder> <subject_name> <semester_name>")
         sys.exit()
-    checkSubjectCodeName = database.selectSubjectInfoSubjectCodeName(sys.argv[2])
-    if checkSubjectCodeName == False:  
+    subjectCodeNameFlag = subject.selectSubjectInfoSubjectCodeName(sys.argv[2])
+    if subjectCodeNameFlag == False:  
         print("Wrong subject code name!. This subject has inactive status or doesn't exists.")
         sys.exit()
-    checkSemesterName = database.selectSemesterInfoSemesterName(sys.argv[3])    
-    if checkSemesterName == False:  
+    semesterNameFlag = semester.selectSemesterInfoSemesterName(sys.argv[3])    
+    if semesterNameFlag == False:  
         print("Wrong semester name!. This semester name  doesn't exists.")
         sys.exit()    
     arg_three= sys.argv[3] #semester name
@@ -287,12 +211,11 @@ if __name__== "__main__":
                         print("Student is "+ people[final_label])
                         picture_name= "frame.jpg"
                         cv2.imwrite(picture_name, frame)
-                        line_pic(people[final_label])
-                        current_position()
-                        database.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,arg_three,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
-                        #line_ipstack()
-                        line_googlemaps()
-                        #google_tts(unicode(people[final_label],"utf-8"))
+                        line.line_pic(people[final_label])
+                        line.line_googlemaps()
+                        classAttendanceLat , classAttendanceLng = position.current_position()
+                        classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,arg_three,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
+                        #text_to_voice(unicode(people[final_label],"utf-8"))
                         final_5= []
                         studentCodeNameKey = inputStudentCodeNameKey()
 
