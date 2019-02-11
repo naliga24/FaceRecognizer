@@ -9,7 +9,7 @@ LINE_API_KEY="MsrOOSUVgB38JhrKhni36IEqDftOpZbUgVYwZZmpxQT"
 
 def line_pic(message):
         url="https://notify-api.line.me/api/notify"
-        res= {"imageFile":open('frame.jpg','rb')}
+        res= {"imageFile":open('frame.jpeg','rb')}
         print (res)
         data = ({
         "message":message

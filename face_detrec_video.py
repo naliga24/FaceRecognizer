@@ -78,7 +78,7 @@ def train_model(path):
     Takes path to images and train a face recognition model
     Returns trained model and people
     '''
-    [images, labels, people]= get_images(sys.argv[1], (256, 256))
+    [images, labels, people]= get_images(path, (256, 256))
     #print([images, labels])
 
     labels= np.asarray(labels, dtype= np.int32)
@@ -86,7 +86,8 @@ def train_model(path):
     # initializing eigen_model and training
     print("Initializing eigen FaceRecognizer and training...")
     sttime= time.clock()
-    eigen_model= cv2.createEigenFaceRecognizer()
+    eigen_model= cv2.createLBPHFaceRecognizer()
+    #eigen_model= cv2.createEigenFaceRecognizer()
     eigen_model.train(images, labels)
     print("\tSuccessfully completed training in "+ str(time.clock()- sttime)+ " Secs!")
 
@@ -113,10 +114,10 @@ def get_student_name(str):
     return name
 
 def text_to_voice(text):
-    tts = gTTS(text=get_student_name(text),lang='th')
+    tts = gTTS(text=text,lang='th')
     tts.save('student-name.mp3')
     os.system('student-name.mp3')
-    time.sleep( 6 )
+    #time.sleep( 6 )
 
 def get_student_id(str):
     id = str[::-1]
@@ -181,7 +182,8 @@ if __name__== "__main__":
             crop_gray_frame= gray_frame[q:q+s, p:p+r]
             crop_gray_frame= cv2.resize(crop_gray_frame, (256, 256))
 
-            [predicted_label, predicted_conf]= eigen_model.predict(np.asarray(crop_gray_frame)) #finding result
+            [predicted_label, predicted_conf ]= eigen_model.predict(np.asarray(crop_gray_frame)) #finding result
+            print(predicted_label, predicted_conf,counter,last_20)
             last_20.append(predicted_label)
             last_20= last_20[1:]
             '''
@@ -208,11 +210,12 @@ if __name__== "__main__":
                     final_5.append(max_label)       #it always takes max_label into consideration
                     if len(final_5)== 1:
                         final_label= majority(final_5)
+                        print(final_5)
                         print("Student is "+ people[final_label])
-                        picture_name= "frame.jpg"
+                        picture_name= "frame.jpeg"
                         cv2.imwrite(picture_name, frame)
                         line.line_pic(people[final_label])
-                        line.line_googlemaps()
+                        #line.line_googlemaps()
                         classAttendanceLat , classAttendanceLng = position.current_position()
                         classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,arg_three,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
                         #text_to_voice(unicode(people[final_label],"utf-8"))

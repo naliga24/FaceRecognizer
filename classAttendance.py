@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-
+from __future__ import with_statement
+from __future__ import absolute_import
 from PIL import Image
 import base64
 #import cStringIO
@@ -9,13 +10,20 @@ import io
 import requests
 import os
 import dbConfig
+from google.cloud import storage
+
+CLOUD_BUCKET = 'student_attendance_images'
+PROJECT_ID = '627471179698'
+
+def get_public_url():
+    return 'https://storage.cloud.google.com/'+CLOUD_BUCKET+'/'
 
 def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,classAttendanceStudentKeyCodeName,classAttendanceLat,classAttendanceLng):
     mydb = dbConfig.config()
     cursor = mydb.cursor()
-    # image = Image.open("frame.jpg", "rb") #comment
-    # blob_value = open('frame.jpg', 'rb').read() #comment
-    #encodestring = base64.b64encode(blob_value)
+    # image = Image.open("frame.jpeg", "rb") #comment
+    # blob_value = open('frame.jpeg', 'rb').read() #comment
+    # encodestring = base64.b64encode(blob_value)
     sql ="SELECT COUNT(STUDENT_CODE_NAME)"
     sql += " FROM student_info"
     sql += " WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'"
@@ -33,9 +41,9 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
       sql += " (SELECT SEMESTER_NO FROM semester_info WHERE SEMESTER_NAME = '"+semesterName+"'),"
       sql += " (SELECT SUBJECT_NO FROM subject_info WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'),"
       sql += " (SELECT STUDENT_NO FROM student_info WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'),"
-      sql += " CONCAT(DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
+      sql += " CONCAT('"+str(get_public_url())+"',DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
-      sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1 ,'.jpg' ),"
+      sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1 ,'.jpeg' ),"
       sql += " '"+classAttendanceStudentKeyCodeName+"',"
       sql += " '"+repr(classAttendanceLat)+"',"
       sql += " '"+repr(classAttendanceLng)+"',"
@@ -51,16 +59,22 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
     print(sql)
     cursor.execute(sql)
     result = cursor.fetchall()
-    print(result)
-    print(result[0][0])
-    if result[0][0]:
-        os.rename('frame.jpg', result[0][0]+'.jpg')
-        blob_value = open(result[0][0]+'.jpg', 'rb')
-        r = requests.post('http://localhost:8080/receiveImgFromFaceRecognizer', files={'studentImage': blob_value})
-        print(r.text)
-        blob_value.close()
-        os.remove(result[0][0]+'.jpg')
     mydb.close() 
+    print(result)
+    print(result[0][0]) 
+    if result[0][0]:
+        os.rename('frame.jpeg', result[0][0]+'.jpeg')
+        # blob_value = open(result[0][0]+'.jpeg', 'rb')
+        # r = requests.post('http://localhost:9000/receiveImgFromFaceRecognizer', files={'studentImage': blob_value})
+        # print(r.text)
+        # blob_value.close()
+        # os.remove(result[0][0]+'.jpeg')
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'My Project 84922-7f660b6844bf.json'
+    client = storage.Client(project=PROJECT_ID)
+    bucket = client.get_bucket(CLOUD_BUCKET)
+    blob = bucket.blob(result[0][0]+'.jpeg')
+    blob.upload_from_filename( result[0][0]+'.jpeg')
+    os.remove(result[0][0]+'.jpeg')
 
 
 def select_class_attendace_info():
