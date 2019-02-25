@@ -12,8 +12,8 @@ import os
 import dbConfig
 from google.cloud import storage
 
-CLOUD_BUCKET = 'student_attendance_images'
-PROJECT_ID = '627471179698'
+CLOUD_BUCKET = 'student_attendance'
+PROJECT_ID = '204186457948'
 
 def get_public_url():
     return 'https://storage.cloud.google.com/'+CLOUD_BUCKET+'/'
@@ -33,17 +33,17 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
     print('COUNT(STUDENT_CODE_NAME) = '+str(result[0][0]))
     if result[0][0] == 1:
       sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SEMESTER_NO , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_KEY_CODE_NAME , CLASS_ATTENDANCE_LAT , CLASS_ATTENDANCE_LNG , CONFIRM_STATUS_NO)"
-      sql += " SELECT DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
+      sql += " SELECT DATE_FORMAT( SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
-      sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1,"
-      sql += " CURRENT_DATE," 
-      sql += " CURRENT_TIME,"
+      sql += " WHERE CLASS_ATTENDANCE_DATE = SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) ) + 1,"
+      sql += " SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10)," 
+      sql += " ADDTIME(CURRENT_TIME(), '07:00:00'),"
       sql += " (SELECT SEMESTER_NO FROM semester_info WHERE SEMESTER_NAME = '"+semesterName+"'),"
       sql += " (SELECT SUBJECT_NO FROM subject_info WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'),"
       sql += " (SELECT STUDENT_NO FROM student_info WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'),"
-      sql += " CONCAT('"+str(get_public_url())+"',DATE_FORMAT( CURRENT_DATE , '%y%m%d' ) * 10000 +"
+      sql += " CONCAT('"+str(get_public_url())+"',DATE_FORMAT( SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
-      sql += " WHERE CLASS_ATTENDANCE_DATE = CURRENT_DATE ) + 1 ,'.jpeg' ),"
+      sql += " WHERE CLASS_ATTENDANCE_DATE = SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) ) + 1 ,'.jpeg' ),"
       sql += " '"+classAttendanceStudentKeyCodeName+"',"
       sql += " '"+repr(classAttendanceLat)+"',"
       sql += " '"+repr(classAttendanceLng)+"',"
@@ -69,8 +69,17 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
         # print(r.text)
         # blob_value.close()
         # os.remove(result[0][0]+'.jpeg')
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'My Project 84922-7f660b6844bf.json'
+
+    #create bucket
+ 
+
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'my-project-1528106461323-04e18a9b4635.json'
     client = storage.Client(project=PROJECT_ID)
+
+    bucket = client.bucket(CLOUD_BUCKET)
+    bucket.location = 'us'
+    bucket.create()
+
     bucket = client.get_bucket(CLOUD_BUCKET)
     blob = bucket.blob(result[0][0]+'.jpeg')
     blob.upload_from_filename( result[0][0]+'.jpeg')

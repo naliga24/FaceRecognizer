@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "my-project-1528106461323",
+  "private_key_id": "04e18a9b4635f8e469368fdabe6e6bb8c17a078a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMlZLHBoLkDrzK\nFVBJQCStMZN4NaKg8QIiv+MXjxEM1L5sESunhyOFgnPxIwltvDVbVPhVgxdmB8Rq\nDm/XaWL5YpbnJ1jfPUecc/W1CXTxgI1l4QzSzZoayb9x/qxJ7OG1lPoVDNDVFX0e\nzGjLOXG4fhppyyN2oFH07d/PN6NEmn057D0E6opgSSedHWr1+p+wt57naw4vahH8\nlEEUHXcvtf88UFNCsCSXrzpsCJDEHbgA9UVoptvwSo1s8yPClQ3P5JGdggSSuuLb\nXuvyrvsdJwB3HyEqfSmVs3z+fgR+9DxQjsXjTTX7g3ERKTkHIXr9CDKnYQMWvVxs\nZFP9hznxAgMBAAECggEAZMRnf1BduCbqJj9JREsrxYLduB/y8oLDIoqROFFnfIJt\nKJ1sex+9B02x/dvcEQja3xmDF9tx8vdwbyydOeTWsy80VLa0t4BffVhAdeMqjqla\n/AtVXZ+XgApPGb7u7ZqXsfCnHScq1Um4TysvkqnAsbarG+DKnutoctOXoWEuMeNk\nq4/GcuJPu605ts11xoye4AfuQVAj+JIOz7ofeFuF+4sBzeSfiwnzSF237F2yoSlC\nBuWf905ojE6f3Rl0TkW3WZylpE1ZQl16g48N1BCsQzmtRLU7EPIWlT+iGqVvRPQG\nsTsTd1/K6sSGs/IcXc6q3gfHuqK3xoW1RLfRJXlVYQKBgQDsSYasyLLJopTWSP6y\nRbwYsyR7Er3QWu+8izoVudJo6qUh/zqkO0HnXVaq+6K/9jvfn/JtSsyTBKAwVCbX\nwmtmMD06AVBG4W89InPmHjgpIb2yF6t5VwYzSketCq9IwxF4zASm/1YcquU4JTyD\n2tbSajyqbMZQ90vv2scjQLU9jwKBgQDdpvSt18dOz128dHvCPKDzYYKH79gGX6DJ\nR2hjKh1je8+ZueSpQhrzCuGZUeZMqFr/52PcQ847QiW7F7WCT8UdEL6BaashXeAi\nEOdU/ACOciINvEB1FakGGP8i65A5lu9MAmZtanFGh+IIgmjNqdMvvLYKx37zhk6g\nUhC9iw9QfwKBgE9jKLd2uvMaB82zOrekzFy0G6aqFlIhq3h6gqp4A2SyqYaxnP8+\n1Zapeov5/aVnUpiAwc/MmM0wea2jKGXHcZQk0v1hIZqe9WPh5nTDZHUVXAmxADDF\nd1TWORy/gUL+HympykpdcY4yMM9bW2ilpxWNEhLkdwEPBVlx9QQ4ImyrAoGAQ5Ih\nJ1oPpYPr9IaiL92hx3BjhaNlfNPsRVAij5CIMwrMh/W2sq63Xn5jtgTUq2vrifX1\naHG3TjNlIzsgF2DQG4M+QF+BTwO6T0hN7YeBd+ttXDiWgdsfkv9N0Ex1xEiyHL7i\nkNqRO8oy6xsubfwmqHfkGzckCYNZNuCtv8rD2WsCgYEAhY8amCTwZI6AcWlR1ide\nVUei7y4EWh933SUDfNc05YUKySTgZ0EL4MJOca9Rq2KP1/ZBetogj/htqgsEMB1o\nVIfZ1em5eCQ6h9Z2ikkuFT8uc6PCFOyJm5In7LG3oIlZJHM4kMLJzy3IMUCjbWnc\nCzgZYvK+fC2iY5T9ZUmhcL4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "facerecognizerwebherokuapp@my-project-1528106461323.iam.gserviceaccount.com",
+  "client_id": "116848059734684374318",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/facerecognizerwebherokuapp%40my-project-1528106461323.iam.gserviceaccount.com"
+}

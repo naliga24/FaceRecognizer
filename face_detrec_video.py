@@ -82,7 +82,7 @@ def train_model(path):
     #print([images, labels])
 
     labels= np.asarray(labels, dtype= np.int32)
-
+    
     # initializing eigen_model and training
     print("Initializing eigen FaceRecognizer and training...")
     sttime= time.clock()
@@ -218,7 +218,7 @@ if __name__== "__main__":
                         line.line_googlemaps()
                         classAttendanceLat , classAttendanceLng = position.current_position()
                         classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,arg_three,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
-                        text_to_voice(unicode(people[final_label],"utf-8"))
+                        #text_to_voice(unicode(people[final_label],"utf-8"))
                         final_5= []
                         studentCodeNameKey = inputStudentCodeNameKey()
 
