@@ -12,11 +12,9 @@ import os
 import dbConfig
 from google.cloud import storage
 
-CLOUD_BUCKET = 'student_attendance'
-PROJECT_ID = '204186457948'
 
 def get_public_url():
-    return 'https://storage.cloud.google.com/'+CLOUD_BUCKET+'/'
+    return 'https://storage.cloud.google.com/'+dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE']+'/'
 
 def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,classAttendanceStudentKeyCodeName,classAttendanceLat,classAttendanceLng):
     mydb = dbConfig.config()
@@ -74,13 +72,13 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
  
 
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'my-project-1528106461323-04e18a9b4635.json'
-    client = storage.Client(project=PROJECT_ID)
+    client = storage.Client(project=dbConfig.googleCloudConfig['PROJECT_ID'])
 
-    bucket = client.bucket(CLOUD_BUCKET)
+    bucket = client.bucket(dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE'])
     bucket.location = 'us'
     bucket.create()
 
-    bucket = client.get_bucket(CLOUD_BUCKET)
+    bucket = client.get_bucket(dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE'])
     blob = bucket.blob(result[0][0]+'.jpeg')
     blob.upload_from_filename( result[0][0]+'.jpeg')
     os.remove(result[0][0]+'.jpeg')
@@ -108,9 +106,13 @@ def select_class_attendace_info():
         img.show()
     mydb.close() 
 
+def test():
+    print(dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE'])
+
 if __name__== "__main__":
-    insert_class_attendace_info('6005004780','cos1103','s/74','x','x','x')
+    #insert_class_attendace_info('6005004780','cos1103','s/74','x','x','x')
     #select_subject_info()
     #select_class_attendace_info()
     #selectSubjectInfoSubjectCodeName('cos1102')
     #print(selectSubjectInfoSubjectCodeName('cos1102'))
+    test()

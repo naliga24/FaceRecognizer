@@ -5,7 +5,7 @@ import json
 import urllib
 import googlemaps
 import position
-LINE_API_KEY="MsrOOSUVgB38JhrKhni36IEqDftOpZbUgVYwZZmpxQT"
+import dbConfig
 
 def line_pic(message):
         url="https://notify-api.line.me/api/notify"
@@ -14,14 +14,14 @@ def line_pic(message):
         data = ({
         "message":message
         })
-        LINE_HEADERS = {"Authorization":"Bearer "+LINE_API_KEY}
+        LINE_HEADERS = {"Authorization":"Bearer "+dbConfig.lineConfig['LINE_API_KEY']}
         session = requests.Session()
         b = session.post(url , headers = LINE_HEADERS , files = res , data = data)
         print(b.text) 
 
 def line_ipstack():
         url="https://notify-api.line.me/api/notify"
-        send_url = "http://api.ipstack.com/check?access_key=5ce47b09f9ee6a9e089068f0a6042b44"
+        send_url = "http://api.ipstack.com/check?access_key="+dbConfig.ipstackConfig['IPSTACK_API_KEY']
         geo_req = requests.get(send_url)
         geo_json = json.loads(geo_req.text)
         latitude = geo_json['latitude']
@@ -29,7 +29,7 @@ def line_ipstack():
         city = geo_json['city']
         print(geo_json)   
         msg = urllib.urlencode({"message":"https://www.google.com/maps/search/?api=1&query="+repr(latitude)+","+repr(longitude)})
-        LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+LINE_API_KEY}
+        LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+dbConfig.lineConfig['LINE_API_KEY']}
         session = requests.Session()
         a = session.post(url , headers = LINE_HEADERS , data=msg)
         print(a.text)
@@ -69,7 +69,7 @@ def line_googlemaps():
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/dir/?api=1&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/@?api=1&map_action=map&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
     #msg = urllib.urlencode({"message":"https://www.google.com/maps/@?api=1&map_action=pano&query="+repr(latitude)+","+repr(longitude)})#3G result correct,cable near
-    LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+LINE_API_KEY}
+    LINE_HEADERS = {"Content-Type":"application/x-www-form-urlencoded","Authorization":"Bearer "+dbConfig.lineConfig['LINE_API_KEY']}
     session = requests.Session()
     a = session.post(url , headers = LINE_HEADERS , data=msg)
     print(a.text)
