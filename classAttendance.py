@@ -16,7 +16,7 @@ from google.cloud import storage
 def get_public_url():
     return 'https://storage.cloud.google.com/'+dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE']+'/'
 
-def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,classAttendanceStudentKeyCodeName,classAttendanceLat,classAttendanceLng):
+def insert_class_attendace_info(studentCodeName,subjectNo,classAttendanceStudentKeyCodeName,classAttendanceLat,classAttendanceLng):
     mydb = dbConfig.config()
     cursor = mydb.cursor()
     # image = Image.open("frame.jpeg", "rb") #comment
@@ -30,14 +30,13 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
     result = cursor.fetchall()
     print('COUNT(STUDENT_CODE_NAME) = '+str(result[0][0]))
     if result[0][0] == 1:
-      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SEMESTER_NO , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_KEY_CODE_NAME , CLASS_ATTENDANCE_LAT , CLASS_ATTENDANCE_LNG , CONFIRM_STATUS_NO)"
+      sql = "INSERT INTO class_attendance_info (CLASS_ATTENDANCE_CODE , CLASS_ATTENDANCE_DATE , CLASS_ATTENDANCE_TIME , SUBJECT_NO , STUDENT_NO , CLASS_ATTENDANCE_IMAGE , CLASS_ATTENDANCE_STUDENT_KEY_CODE_NAME , CLASS_ATTENDANCE_LAT , CLASS_ATTENDANCE_LNG , CONFIRM_STATUS_NO)"
       sql += " SELECT DATE_FORMAT( SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
       sql += " WHERE CLASS_ATTENDANCE_DATE = SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) ) + 1,"
       sql += " SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10)," 
       sql += " ADDTIME(CURRENT_TIME(), '07:00:00'),"
-      sql += " (SELECT SEMESTER_NO FROM semester_info WHERE SEMESTER_NAME = '"+semesterName+"'),"
-      sql += " (SELECT SUBJECT_NO FROM subject_info WHERE SUBJECT_CODE_NAME = '"+subjectCodeName+"'),"
+      sql += " "+str(subjectNo)+","
       sql += " (SELECT STUDENT_NO FROM student_info WHERE STUDENT_CODE_NAME = '"+studentCodeName+"'),"
       sql += " CONCAT('"+str(get_public_url())+"',DATE_FORMAT( SUBSTRING(DATE_ADD(NOW(), INTERVAL 7 HOUR), 1,10) , '%y%m%d' ) * 10000 +"
       sql += " (SELECT COUNT( CLASS_ATTENDANCE_DATE ) FROM class_attendance_info"
@@ -71,13 +70,15 @@ def insert_class_attendace_info(studentCodeName,subjectCodeName,semesterName,cla
     #create bucket
  
 
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'my-project-1528106461323-04e18a9b4635.json'
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = dbConfig.googleCloudConfig['SERVICE_ACCOUNT_KEY']
     client = storage.Client(project=dbConfig.googleCloudConfig['PROJECT_ID'])
 
-    bucket = client.bucket(dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE'])
-    bucket.location = 'us'
-    bucket.create()
+    # create new bucket 
+    # bucket = client.bucket(dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE'])
+    # bucket.location = 'us'
+    # bucket.create()
 
+    # upload image to existing bucket
     bucket = client.get_bucket(dbConfig.googleCloudConfig['CLOUD_BUCKET_ATTENDANCE'])
     blob = bucket.blob(result[0][0]+'.jpeg')
     blob.upload_from_filename( result[0][0]+'.jpeg')

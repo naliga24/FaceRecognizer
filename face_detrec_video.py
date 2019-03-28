@@ -146,16 +146,13 @@ if __name__== "__main__":
         print("Wrong number of arguments! See the usage.\n")
         print("Usage: face_detrec_video.py <full/path/to/root/images/folder> <subject_name> <semester_name>")
         sys.exit()
-    subjectCodeNameFlag = subject.selectSubjectInfoSubjectCodeName(sys.argv[2])
-    if subjectCodeNameFlag == False:  
-        print("Wrong subject code name!. This subject has inactive status or doesn't exists.")
-        sys.exit()
-    semesterNameFlag = semester.selectSemesterInfoSemesterName(sys.argv[3])    
-    if semesterNameFlag == False:  
-        print("Wrong semester name!. This semester name  doesn't exists.")
-        sys.exit()    
+
+    subjectNo = subject.selectSubjectInfoSubjectNo(sys.argv[2],sys.argv[3])
     arg_three= sys.argv[3] #semester name
-    arg_two= sys.argv[2] #subject_name
+    if type(subjectNo) != int:  
+        print("Wrong subject name with semester name!. This subject name with semester name  doesn't exists.")
+        sys.exit()
+    # arg_two= sys.argv[2] #subject_name
     arg_one= sys.argv[1]
     eigen_model, people= train_model(arg_one)
 
@@ -208,7 +205,7 @@ if __name__== "__main__":
                 if counter > 20:   #counter> 20
                     print("Will post on LINE notify if this counter reaches to 1: "+ str(len(final_5)+ 1))
                     final_5.append(max_label)       #it always takes max_label into consideration
-                    if len(final_5)== 1:
+                    if len(final_5)== 5:
                         final_label= majority(final_5)
                         print(final_5)
                         print("Student is "+ people[final_label])
@@ -217,8 +214,8 @@ if __name__== "__main__":
                         line.line_pic(people[final_label])
                         line.line_googlemaps()
                         classAttendanceLat , classAttendanceLng = position.current_position()
-                        classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),arg_two,arg_three,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
-                        #text_to_voice(unicode(people[final_label],"utf-8"))
+                        classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),subjectNo,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
+                        text_to_voice(unicode(people[final_label],"utf-8"))
                         final_5= []
                         studentCodeNameKey = inputStudentCodeNameKey()
 
