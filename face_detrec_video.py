@@ -132,6 +132,13 @@ def inputStudentCodeNameKey():
         tmp = raw_input('please type 10 digits of student code name!: ')
     return tmp
 
+def checkResult():
+    tmp = raw_input('result is: '+people[final_label]+'\n please input "x" if result is correct \n please input "y" if result is not correct\n')
+    while(tmp != 'x' and tmp != 'y'):
+        print('wrong format input!')
+        tmp = raw_input('result: '+people[final_label]+'\n please input "x" if result is correct \n please input "y" if result is not correct\n:')
+    return tmp
+
 def current_position():
     session = requests.Session()
     a = session.post('https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyBu87xwiRb4bzfjLyFsGNFzGI1dLCVQhcM' , headers = {'Content-Type': 'application/json'})
@@ -205,7 +212,7 @@ if __name__== "__main__":
                 if counter > 20:   #counter> 20
                     print("Will post on LINE notify if this counter reaches to 1: "+ str(len(final_5)+ 1))
                     final_5.append(max_label)       #it always takes max_label into consideration
-                    if len(final_5)== 5:
+                    if len(final_5)== 1:
                         final_label= majority(final_5)
                         print(final_5)
                         print("Student is "+ people[final_label])
@@ -214,8 +221,10 @@ if __name__== "__main__":
                         line.line_pic(people[final_label])
                         line.line_googlemaps()
                         classAttendanceLat , classAttendanceLng = position.current_position()
-                        classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),subjectNo,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
-                        text_to_voice(unicode(people[final_label],"utf-8"))
+                        resultFlag = checkResult()
+                        if resultFlag == 'x':
+                            classAttendance.insert_class_attendace_info(get_student_id(people[final_label]),subjectNo,studentCodeNameKey,classAttendanceLat,classAttendanceLng)
+                            text_to_voice(unicode(people[final_label],"utf-8"))
                         final_5= []
                         studentCodeNameKey = inputStudentCodeNameKey()
 
